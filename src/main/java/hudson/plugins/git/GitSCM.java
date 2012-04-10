@@ -599,15 +599,18 @@ public class GitSCM extends SCM implements Serializable {
      */
     private String getSingleBranch(AbstractBuild<?, ?> build) {
         // if we have multiple branches skip to advanced usecase
-        if (getBranches().size() != 1 || getRepositories().size() != 1) {
+        if (getBranches().size() != 1) {
             return null;
         }
 
         String branch = getBranches().get(0).getName();
-        String repository = getRepositories().get(0).getName();
+        if (branch.startsWith("*/") && getRepositories().size() != 1) {
+            return null;
+        }
 
         // replace repository wildcard with repository name
         if (branch.startsWith("*/")) {
+            String repository = getRepositories().get(0).getName();
             branch = repository + branch.substring(1);
         }
 
